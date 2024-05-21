@@ -1,4 +1,21 @@
-img {
+/* Common */
+.logo {
   height: 50px;
   width: 50px;
+}
+
+/* Navbar */
+.navbar {
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid red;
+}
+
+.navbar-links {
+  list-style-type: none;
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
 }/*# sourceMappingURL=app.css.map */
