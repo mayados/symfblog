@@ -16,7 +16,7 @@ class JWTService
      * @return string
     */
 
-    public function generate(array $header, array $payload, string $secret, int $validity)
+    public function generate(array $header, array $payload, string $secret, int $validity = 10800): string
     {
         if($validity > 0){
             $now = new DateTimeImmutable();
@@ -53,12 +53,52 @@ class JWTService
     public function isValid(string $token): bool
     {
         return preg_match(
-            '/^[a-zA-Z0-9\-\_\=]+\.[a-zA-Z0-9\-\_\=]+\.[a-zA-Z0-9\-\_\=]+$',$token
+            '/^[a-zA-Z0-9\-\_\=]+\.[a-zA-Z0-9\-\_\=]+\.[a-zA-Z0-9\-\_\=]+$/',$token
         )=== 1;
     }
 
     // we get the payload
+    public function getPayload(string $token): array
+    {
+        //explode
+        $array = explode('.',$token);
 
-    
+        //decoding
+        $payload = json_decode(base64_decode($array[1]), true);
+
+        return $payload;
+    }
+
+    //get the header
+    public function getHeader(string $token): array
+    {
+        $array = explode('.',$token);
+
+        $header = json_decode(base64_decode($array[0]), true);
+
+        return $header;
+    }
+
+    public function isExpired(string $token): bool
+    {
+        $payload = $this->getPayload($token);
+
+        $now = new DateTimeImmutable();
+
+        return $payload['exp'] < $now->getTimestamp();
+    }
+
+    //verifying token's signature
+    public function check(string $token, string $secret)
+    {
+        $header = $this->getHeader($token);
+        $payload = $this->getPayload($token);
+
+        //generate token
+        $verifToken = $this->generate($header, $payload, $secret, 0);
+
+        return $token === $verifToken;
+    }
+
 
 }
